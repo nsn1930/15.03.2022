@@ -1,7 +1,6 @@
-import { writeFile, readFile, access } from 'fs'
+import { writeFile, readFile, accessSync } from 'fs'
 import express from 'express'
 import { engine } from 'express-handlebars'
-
 
 const app = express()
 const database = './database.json'
@@ -14,45 +13,20 @@ app.use(express.urlencoded({
     extended: false
 }))
 
-
 app.get('/check-file', (req, res) => {
-    access(database, (err) => {
-        if (err) {
-            console.log('Failo nepavyko surasti')
-        } else {
-            console.log('Failas sekmingai surastas')
-        }
-    })
+    try {
+        accessSync(database)
+        console.log('Failas egzistuoja')
+        res.send('Failas egzistuoja')
+    } catch (err) {
+        console.log('Failo nera')
+        res.send('Failo nera')
+    }
 })
-
-
-
-
 
 app.get('/add-user', (req, res) => {
     res.render('add-user')
 })
-
-// app.post('/add-user', function (req, res) {
-//     let masyvas = []
-
-//     if (Object.keys(req.body).length > 0) {
-//         masyvas.push(
-//             req.body
-//         )
-//     }
-
-//     writeFile('./database.json', JSON.stringify(masyvas), 'utf8', function (err) {
-//         if (!err) {
-//             console.log('Failas sekmingai issaugotas')
-//         } else {
-//             console.log('Ivyko klaida')
-//         }
-//     })
-
-//     res.send('Success')
-// })
-
 
 app.post('/add-user', (req, res) => {
     if (Object.keys(req.body).length > 0) {
@@ -69,15 +43,18 @@ app.post('/add-user', (req, res) => {
 
         } else {
 
-            let masyvas = []
+            try {
 
-            access(database, (err) => {
+                accessSync(database)
 
-                if (err) {
+                //Jeigu failas yra
 
-                    masyvas.push(req.body)
+                readFile(database, 'utf8', (err, data) => {
+                    let dataArray = JSON.parse(data)
 
-                    writeFile(database, JSON.stringify(masyvas), 'utf8', (err) => {
+                    dataArray.push(req.body)
+
+                    writeFile(database, JSON.stringify(dataArray), 'utf8', (err) => {
                         if (!err) {
                             console.log('Failas sekmingai issaugotas')
                         } else {
@@ -85,35 +62,29 @@ app.post('/add-user', (req, res) => {
                         }
                     })
 
-                    return false
+                })
 
+            } catch (err) {
 
-                } else {
+                //Jeigu failo nera
 
+                let masyvas = []
 
-                    readFile(database, 'utf8', (err, data) => {
+                masyvas.push(req.body)
 
-                        let dataArray = JSON.parse(data)
+                writeFile(database, JSON.stringify(masyvas), 'utf8', (err) => {
+                    if (!err) {
+                        console.log('Failas sekmingai issaugotas')
+                    } else {
+                        console.log(err)
+                    }
+                })
 
-                        dataArray.push(req.body)
-
-                        writeFile(database, JSON.stringify(dataArray), 'utf8', (err) => {
-                            if (!err) {
-                                console.log('Failas sekmingai issaugotas')
-                            } else {
-                                console.log(err)
-                            }
-                        })
-
-                    })
-                }
-            })
-
+            }
 
         }
 
     }
 })
-
 
 app.listen(3001)
