@@ -1,4 +1,4 @@
-import { writeFile, readFile, accessSync } from 'fs'
+import { writeFile, readFile, existsSync } from 'fs'
 import express from 'express'
 import { engine } from 'express-handlebars'
 
@@ -14,11 +14,10 @@ app.use(express.urlencoded({
 }))
 
 app.get('/check-file', (req, res) => {
-    try {
-        accessSync(database)
+    if (existsSync(database)) {
         console.log('Failas egzistuoja')
         res.send('Failas egzistuoja')
-    } catch (err) {
+    } else {
         console.log('Failo nera')
         res.send('Failo nera')
     }
@@ -38,14 +37,12 @@ app.post('/add-user', (req, res) => {
             req.body.address === ''
         ) {
 
-            res.render('add-user', { message: 'Neteisingai užpildyti duomenys' })
+            res.render('add-user', { message: 'Neteisingai užpildyti duomenys', status: 'red' })
             return
 
         } else {
 
-            try {
-
-                accessSync(database)
+            if (existsSync(database)) {
 
                 //Jeigu failas yra
 
@@ -56,7 +53,8 @@ app.post('/add-user', (req, res) => {
 
                     writeFile(database, JSON.stringify(dataArray), 'utf8', (err) => {
                         if (!err) {
-                            console.log('Failas sekmingai issaugotas')
+                            res.render('add-user', { message: 'Duomenys issiusti', status: 'green' })
+                            return
                         } else {
                             console.log(err)
                         }
@@ -64,7 +62,7 @@ app.post('/add-user', (req, res) => {
 
                 })
 
-            } catch (err) {
+            } else {
 
                 //Jeigu failo nera
 
