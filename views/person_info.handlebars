@@ -1,0 +1,91 @@
+{{#if value}}
+    <table class="table table-hover">
+        <thead>
+            <th>#</th>
+            <th>Vadas</th>
+            <th>Pavarde</th>
+            <th>Telefonas</th>
+            <th>Adresas</th>
+            <th>E-mail</th>
+            <th>Action</th>
+        </thead>
+        <tbody>
+            {{#each value}}
+                <tr>
+                    <td>{{this.id}}</td>
+                    <td>{{this.name}}</td>
+                    <td>{{this.last_name}}</td>
+                    <td>{{this.phone}}</td>
+                    <td>{{this.email}}</td>
+                    <td>{{this.address}}</td>
+                    <td>                        
+                        <button data-id="{{id}}" class="btn btn-outline-danger delete-button">Delete</button>                        
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+{{/if}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    body{
+        background-color: bisque;
+    }
+    table th{
+        width: 200px;
+        color: brown;
+        font-size: 20px;
+    }
+    tbody td{
+        background-color: #fff;
+        padding: 3px;
+    }
+</style>
